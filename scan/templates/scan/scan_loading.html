@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center">
+            <div class="card transparent-card shadow-lg border-0 rounded-4 p-4">
+                <div class="card-body">
+
+                    <!-- Scanning Image with Laser -->
+                    <div class="scanning-image-wrapper mb-4">
+                        <img src="{{ image_url }}" alt="Uploaded barcode" class="img-fluid rounded-3 shadow preview-image">
+                        <div class="dim-overlay"></div>
+                        <div class="laser-overlay"></div>
+                    </div>
+
+                    <!-- Status Messages -->
+                    <div class="status-container mb-4">
+                        <h3 class="mb-3">Processing Your Scan</h3>
+                        <div class="progress-stages">
+                            <div class="stage active">
+                                <i class="bi bi-check-circle-fill me-2"></i> Image Uploaded
+                            </div>
+                            <div class="stage" id="scanStage">
+                                <i class="bi bi-upc-scan me-2"></i> Scanning Barcode
+                            </div>
+                            <div class="stage" id="productStage">
+                                <i class="bi bi-box-seam me-2"></i> Fetching Product Info
+                            </div>
+                            <div class="stage" id="analysisStage">
+                                <i class="bi bi-graph-up me-2"></i> Analyzing Nutrition
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress mb-4 rounded-pill">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-gradient" 
+                             role="progressbar" 
+                             id="progressBar"
+                             aria-valuenow="25" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100"></div>
+                    </div>
+
+                    <!-- Loading Animation -->
+                    <div class="loading-animation mb-4">
+                        <div class="spinner-grow text-primary" role="status"></div>
+                        <div class="spinner-grow text-success" role="status"></div>
+                        <div class="spinner-grow text-info" role="status"></div>
+                    </div>
+
+                    <p class="text-muted">This usually takes 5–10 seconds. Please don't close this page.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const progressBar = document.getElementById('progressBar');
+    const scanStage = document.getElementById('scanStage');
+    const productStage = document.getElementById('productStage');
+    const analysisStage = document.getElementById('analysisStage');
+
+    let progress = 25;
+    const interval = setInterval(() => {
+        progress += Math.floor(Math.random() * 5) + 1;
+        if (progress >= 100) progress = 99;
+        progressBar.style.width = `${progress}%`;
+        progressBar.setAttribute('aria-valuenow', progress);
+
+        // Update stages
+        if (progress > 30) scanStage.classList.add('active');
+        if (progress > 60) productStage.classList.add('active');
+        if (progress > 85) analysisStage.classList.add('active');
+    }, 800);
+
+    // Check processing status
+    const checkStatus = () => {
+        fetch("{% url 'process_scan' filename %}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    clearInterval(interval);
+                    progressBar.style.width = '100%';
+                    progressBar.setAttribute('aria-valuenow', 100);
+                    setTimeout(() => {
+                        window.location.href = "{% url 'result' %}";
+                    }, 800);
+                } else if (data.status === 'error') {
+                    clearInterval(interval);
+                    document.querySelector('.status-container').innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            ${data.message || 'Processing failed. Please try again.'}
+                        </div>
+                        <a href="{% url 'scan' %}" class="btn btn-primary mt-3">
+                            <i class="bi bi-arrow-repeat me-2"></i>Try Again
+                        </a>
+                    `;
+                } else {
+                    setTimeout(checkStatus, 2000);
+                }
+            });
+    };
+
+    // Start checking status after initial delay
+    setTimeout(checkStatus, 3000);
+});
+</script>
+
+<style>
+.transparent-card {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.scanning-image-wrapper {
+    position: relative;
+    display: inline-block;
+    max-height: 300px;
+}
+
+.preview-image {
+    max-height: 300px;
+    width: 100%;
+    object-fit: contain;
+    border: 1px solid #e0e0e0;
+    background: white;
+    border-radius: 12px;
+    z-index: 1;
+}
+
+.dim-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.25);
+    z-index: 2;
+    border-radius: 12px;
+}
+
+.laser-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 0, 0, 0.6);
+    box-shadow: 0 0 12px 4px rgba(255, 0, 0, 0.8);
+    animation: laserScan 2.5s infinite linear;
+    z-index: 3;
+    border-radius: 2px;
+}
+
+@keyframes laserScan {
+    0% { top: 0%; }
+    100% { top: 100%; }
+}
+
+.progress-stages {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.progress-stages::before {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #e9ecef;
+    z-index: 0;
+    border-radius: 2px;
+}
+
+.stage {
+    position: relative;
+    z-index: 1;
+    background: white;
+    padding: 8px 15px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+}
+
+.stage.active {
+    background: #e8f4ff;
+    color: #0d6efd;
+    border-color: #b6d4fe;
+    font-weight: 500;
+}
+
+.stage i {
+    font-size: 1.1rem;
+}
+
+.progress {
+    height: 12px;
+    background: #e9ecef;
+}
+
+.bg-gradient {
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.loading-animation {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 25px 0;
+}
+
+.spinner-grow {
+    width: 2rem;
+    height: 2rem;
+    animation-duration: 1.2s;
+}
+
+.spinner-grow:nth-child(1) { animation-delay: 0s; }
+.spinner-grow:nth-child(2) { animation-delay: 0.4s; }
+.spinner-grow:nth-child(3) { animation-delay: 0.8s; }
+</style>
+{% endblock %}

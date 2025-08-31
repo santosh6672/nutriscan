@@ -1,0 +1,489 @@
+{% extends 'base.html' %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<!-- HTML Content -->
+<div class="form-container">
+    <div class="glass-form">
+        <h2 class="form-title">Create Your Account</h2>
+        <p class="form-subtitle">Join us to start your health journey</p>
+        
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <div class="two-column-form">
+                <!-- Left Column -->
+                <div class="form-column">
+                    <div class="form-section">
+                        <div class="form-section-title">Personal Information</div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Full Name</label>
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <input type="text" name="name" class="styled-input" placeholder="John Doe" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Email Address</label>
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <input type="email" name="email" class="styled-input" placeholder="your@email.com" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Password</label>
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <input type="password" name="password" class="styled-input" placeholder="••••••••" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <div class="form-section-title">Demographics</div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Age</label>
+                            <div class="input-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <input type="number" name="age" class="styled-input" placeholder="30" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Gender</label>
+                            <div class="input-icon">
+                                <i class="fas fa-venus-mars"></i>
+                            </div>
+                            <select name="gender" class="styled-input" required>
+                                <option value="" disabled selected>Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                                <option value="prefer-not-to-say">Prefer not to say</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div class="form-column">
+                    <div class="form-section">
+                        <div class="form-section-title">Health Metrics</div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Weight (kg)</label>
+                            <div class="input-icon">
+                                <i class="fas fa-weight"></i>
+                            </div>
+                            <input type="number" step="0.1" name="weight" class="styled-input" placeholder="70.5" required id="weight-input">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Height</label>
+                            <div class="unit-toggle">
+                                <button type="button" class="unit-btn active" data-unit="cm">cm</button>
+                                <button type="button" class="unit-btn" data-unit="ft">ft/in</button>
+                            </div>
+                            <div id="height-cm-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-ruler-vertical"></i>
+                                </div>
+                                <input type="number" step="0.1" class="styled-input" id="height-cm-input" placeholder="175" required>
+                            </div>
+                            <div id="height-ft-group" style="display: none;">
+                                <div class="height-input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-ruler-vertical"></i>
+                                    </div>
+                                    <input type="number" class="styled-input" id="height-ft-input" placeholder="Feet">
+                                    <input type="number" class="styled-input" id="height-in-input" placeholder="Inches">
+                                </div>
+                            </div>
+                            <input type="hidden" name="height" id="height-hidden">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">BMI</label>
+                            <div class="bmi-display">
+                                <span id="bmi-output">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <div class="form-section-title">Preferences</div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Health Conditions</label>
+                            <div class="input-icon">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <input type="text" name="health_conditions" class="styled-input" placeholder="e.g. Diabetes, Hypertension">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Dietary Preferences</label>
+                            <div class="input-icon">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <input type="text" name="dietary_preferences" class="styled-input" placeholder="e.g. Vegan, Keto">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Your Goal</label>
+                            <div class="input-icon">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <input type="text" name="goal" class="styled-input" placeholder="e.g. Weight Loss, Muscle Gain">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn">
+                <span>Create Account</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            
+            <p class="login-link">Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
+        </form>
+    </div>
+</div>
+
+<!-- External Resources -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Unit toggle functionality
+    const unitButtons = document.querySelectorAll('.unit-btn');
+    const heightCmGroup = document.getElementById('height-cm-group');
+    const heightFtGroup = document.getElementById('height-ft-group');
+    const heightCmInput = document.getElementById('height-cm-input');
+    const heightFtInput = document.getElementById('height-ft-input');
+    const heightInInput = document.getElementById('height-in-input');
+    const weightInput = document.getElementById('weight-input');
+    const heightHidden = document.getElementById('height-hidden');
+    const bmiOutput = document.getElementById('bmi-output');
+
+    function toggleUnit(unit) {
+        unitButtons.forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.unit-btn[data-unit="${unit}"]`).classList.add('active');
+
+        if (unit === 'cm') {
+            heightCmGroup.style.display = 'block';
+            heightFtGroup.style.display = 'none';
+            heightCmInput.required = true;
+            heightFtInput.required = false;
+            heightInInput.required = false;
+        } else {
+            heightCmGroup.style.display = 'none';
+            heightFtGroup.style.display = 'block';
+            heightCmInput.required = false;
+            heightFtInput.required = true;
+            heightInInput.required = true;
+        }
+        calculateBMI();
+    }
+
+    unitButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            toggleUnit(this.dataset.unit);
+        });
+    });
+
+    function calculateHeightCM() {
+        const unit = document.querySelector('.unit-btn.active').dataset.unit;
+        let heightCm = 0;
+
+        if (unit === 'cm') {
+            heightCm = parseFloat(heightCmInput.value) || 0;
+        } else {
+            const feet = parseFloat(heightFtInput.value) || 0;
+            const inches = parseFloat(heightInInput.value) || 0;
+            heightCm = (feet * 12 + inches) * 2.54;
+        }
+        
+        heightHidden.value = heightCm.toFixed(2);
+        return heightCm;
+    }
+
+    function calculateBMI() {
+        const weight = parseFloat(weightInput.value) || 0;
+        const heightCm = calculateHeightCM();
+        const heightM = heightCm / 100;
+        const bmi = weight / (heightM * heightM);
+        
+        if (bmi > 0) {
+            bmiOutput.textContent = bmi.toFixed(1);
+            
+            // Color coding based on BMI ranges
+            if (bmi < 18.5) {
+                bmiOutput.style.color = '#3b82f6'; // Underweight - blue
+            } else if (bmi >= 18.5 && bmi < 25) {
+                bmiOutput.style.color = '#10b981'; // Normal - green
+            } else if (bmi >= 25 && bmi < 30) {
+                bmiOutput.style.color = '#f59e0b'; // Overweight - orange
+            } else {
+                bmiOutput.style.color = '#ef4444'; // Obese - red
+            }
+        } else {
+            bmiOutput.textContent = '--';
+            bmiOutput.style.color = 'inherit';
+        }
+    }
+
+    // Event listeners for real-time updates
+    [heightCmInput, heightFtInput, heightInInput, weightInput].forEach(input => {
+        input.addEventListener('input', calculateBMI);
+    });
+
+    // Initialize with cm unit
+    toggleUnit('cm');
+});
+</script>
+<!-- CSS Styles -->
+<style>
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #4f46e5;
+        --accent-color: #8b5cf6;
+        --text-color: #1e293b;
+        --background-color: #f8fafc;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-image: url("{% static 'images/bg.png' %}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem;
+        margin: 0;
+    }
+
+    .form-container {
+        max-width: 900px;
+        width: 100%;
+        margin: 2rem auto;
+        animation: fadeInUp 0.7s ease;
+    }
+
+    .glass-form {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .form-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+        text-align: center;
+        background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .form-subtitle {
+        color: #64748b;
+        text-align: center;
+        margin-bottom: 2.5rem;
+        font-size: 1rem;
+    }
+
+    .two-column-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .form-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .input-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        z-index: 1;
+    }
+
+    .styled-input {
+        width: 100%;
+        padding: 0.9rem 1rem 0.9rem 2.8rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+
+    .styled-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        background: white;
+        outline: none;
+    }
+
+    .styled-input::placeholder {
+        color: #cbd5e1;
+    }
+
+    .input-label {
+        display: block;
+        font-weight: 500;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Unit toggle styles */
+    .unit-toggle {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .unit-btn {
+        padding: 0.4rem 0.8rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    .unit-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    /* Height input groups */
+    .height-input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .height-input-group input {
+        flex: 1;
+    }
+
+    /* BMI display */
+    .bmi-display {
+        background: #f1f5f9;
+        border-radius: 10px;
+        padding: 0.9rem;
+        text-align: center;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    /* Submit button */
+    .submit-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #64748b;
+    }
+
+    .login-link a {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+    /* Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .two-column-form {
+            grid-template-columns: 1fr;
+        }
+        
+        .glass-form {
+            padding: 2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .glass-form {
+            padding: 1.5rem;
+        }
+        
+        .form-title {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+{% endblock %}

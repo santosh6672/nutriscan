@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="form-title">Welcome Back! 👋</h2>
+    <p class="form-subtitle">Please sign in to continue</p>
+
+    {% if form.errors %}
+    <div class="alert alert-error">
+        ⚠️ Invalid email or password. Please try again.
+    </div>
+    {% endif %}
+
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+
+        <div class="input-group">
+            <div class="input-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <input type="email" name="email" class="styled-input" placeholder="Enter your email" required>
+            <label class="input-label">Email Address</label>
+        </div>
+
+        <div class="input-group">
+            <div class="input-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <input type="password" name="password" class="styled-input" placeholder="••••••••" required>
+            <label class="input-label">Password</label>
+            <button type="button" class="password-toggle">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+
+        <div class="form-options">
+            <label class="remember-me">
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                Remember me
+            </label>
+            <a href="#forgot-password" class="forgot-password">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="login-btn">
+            <span class="btn-text">Sign In</span>
+            <i class="fas fa-arrow-right"></i>
+        </button>
+
+        <div class="social-login">
+            <p class="divider">Or continue with</p>
+            <div class="social-buttons">
+                <button type="button" class="social-btn google">
+                    <i class="fab fa-google"></i>
+                </button>
+                <button type="button" class="social-btn github">
+                    <i class="fab fa-github"></i>
+                </button>
+                <button type="button" class="social-btn facebook">
+                    <i class="fab fa-facebook"></i>
+                </button>
+            </div>
+        </div>
+
+        <p class="register-link">New here? <a href="{% url 'register' %}">Create an account</a></p>
+    </form>
+</div>
+
+<style>
+    /* Inherit body styles from base.html */
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh; /* Ensure the body takes at least the full viewport height */
+    }
+
+    .form-container {
+        background: rgba(255, 255, 255, 0.85); /* Make the form background slightly transparent */
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2.5rem 3rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 440px;
+        margin: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transform: translateY(0);
+        animation: float 4s ease-in-out infinite;
+    }
+
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #4f46e5;
+        --accent-color: #8b5cf6;
+        --text-color: #1e293b;
+        --background-color: #f8fafc;
+    }
+
+    .form-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+        text-align: center;
+        background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .form-subtitle {
+        color: #64748b;
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+    }
+
+    .input-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        z-index: 1;
+    }
+
+    .styled-input {
+        width: 100%;
+        padding: 0.9rem 1rem 0.9rem 2.8rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+
+    .styled-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        background: white;
+        outline: none;
+    }
+
+    .styled-input:focus + .input-label,
+    .styled-input:not(:placeholder-shown) + .input-label {
+        transform: translateY(-120%);
+        font-size: 0.8rem;
+        color: var(--primary-color);
+    }
+
+    .input-label {
+        position: absolute;
+        left: 2.8rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        pointer-events: none;
+        transition: all 0.3s ease;
+        background: linear-gradient(0deg, #f8fafc 50%, white 50%);
+        padding: 0 0.3rem;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .form-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 1rem 0;
+        font-size: 0.9rem;
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        cursor: pointer;
+    }
+
+    .checkmark {
+        display: inline-block;
+        width: 1.1rem;
+        height: 1.1rem;
+        border: 2px solid #cbd5e1;
+        border-radius: 4px;
+        position: relative;
+    }
+
+    input[type="checkbox"]:checked + .checkmark {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .forgot-password {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .forgot-password:hover {
+        color: var(--secondary-color);
+        text-decoration: underline;
+    }
+
+    .social-login {
+        margin: 2rem 0;
+    }
+
+    .divider {
+        text-align: center;
+        color: #64748b;
+        position: relative;
+        margin: 1.5rem 0;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: 45%;
+        height: 1px;
+        background: #e2e8f0;
+    }
+
+    .divider::before {
+        left: 0;
+    }
+
+    .divider::after {
+        right: 0;
+    }
+
+    .social-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .social-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .social-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .social-btn.google:hover { color: #db4437; }
+    .social-btn.github:hover { color: #181717; }
+    .social-btn.facebook:hover { color: #1877f2; }
+
+    .register-link {
+        text-align: center;
+        color: #64748b;
+        margin-top: 1.5rem;
+    }
+
+    .register-link a {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .register-link a:hover {
+        text-decoration: underline;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @media (max-width: 480px) {
+        .form-container {
+            padding: 1.5rem;
+            margin: 1rem;
+        }
+
+        .form-title {
+            font-size: 1.75rem;
+        }
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<script>
+// Add password visibility toggle
+document.querySelectorAll('.password-toggle').forEach(button => {
+    button.addEventListener('click', (e) => {
+        const input = e.currentTarget.previousElementSibling;
+        const icon = e.currentTarget.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    });
+});
+</script>
+
+{% endblock %}

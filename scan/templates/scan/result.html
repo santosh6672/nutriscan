@@ -1,0 +1,453 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container my-5 d-flex justify-content-center">
+    <div class="card transparent-card shadow-lg">
+        <div class="text-center mb-4 px-4 pt-4">
+            <h2 class="fw-bold">{{ product.product_name }}</h2>
+        </div>
+
+        <div class="row g-3 align-items-center justify-content-center px-3">
+            <!-- Product Image -->
+            <div class="col-md-6 text-center order-md-1 order-1">
+                {% if product.image_url %}
+                    <img src="{{ product.image_url }}" alt="{{ product.product_name }}" class="img-fluid rounded shadow-sm product-image">
+                {% else %}
+                    <div class="alert alert-secondary">Image not available</div>
+                {% endif %}
+            </div>
+
+            <!-- Nutrition Label -->
+            <div class="col-md-6 d-flex justify-content-center order-md-2 order-2">
+                <div class="nutrition-label">
+                    <div class="nutrition-title">Nutrition Facts</div>
+                    <div class="nutrition-serving">Serving Size: 100g</div>
+                    <hr class="my-2">
+                    <div class="nutrition-row">
+                        <span class="label">Calories</span>
+                        <span class="value">{{ product.nutriments|get_item:'energy-kcal'|default:'N/A' }} kcal</span>
+                    </div>
+                    <hr class="my-2">
+                    <div class="nutrition-row bold">Amount Per Serving</div>
+                    {% with nutrients=nutrient_map|split:'|' %}
+                    {% for nutrient in nutrients %}
+                        {% with parts=nutrient|split:':' %}
+                            {% with key=parts.0 name=parts.1 %}
+                                {% if product.nutriments|get_item:key %}
+                                    <div class="nutrition-row">
+                                        <span class="label">{{ name }}</span>
+                                        <span class="value">
+                                            {{ product.nutriments|get_item:key }}
+                                            {% if key == 'energy' or key == 'energy-kcal' %}kcal{% else %}g{% endif %}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        {% endwith %}
+                    {% endfor %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Nutri-Score Scale Section -->
+        <div class="row align-items-center justify-content-center px-4 my-4">
+            <div class="col-md-10">
+                <h5 class="fw-bold mb-3 text-center">Nutri-Score Scale</h5>
+                {% if product.nutriscore_grade != "N/A" %}
+                <div class="nutriscore-scale" role="radiogroup">
+                    {% for grade in 'ABCDE' %}
+                    <div class="grade grade-{{ grade|lower }} {% if grade == product.nutriscore_grade|upper %}active{% endif %}"
+                         role="radio" aria-checked="{% if grade == product.nutriscore_grade|upper %}true{% else %}false{% endif %}"
+                         data-grade="{{ grade }}">
+                        {{ grade }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="grade-info mt-3 p-3 rounded"></div>
+                {% else %}
+                <div class="alert alert-warning mt-2 text-center">Nutri-Score not available</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Enhanced Personalized Nutrition Section -->
+        <div class="px-4 pb-3">
+           <!-- Advisability Section - Updated Wording -->
+<div class="mb-5">
+    {% if analysis.advisability %}
+        <div class="nutrition-recommendation 
+            {% if analysis.advisability == 'Advisable' %}bg-success
+            {% elif analysis.advisability == 'Not Advisable' %}bg-danger
+            {% else %}bg-warning{% endif %}">
+            <div class="d-flex align-items-center justify-content-between p-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas 
+                        {% if analysis.advisability == 'Advisable' %}fa-check-circle
+                        {% else %}fa-exclamation-triangle{% endif %} 
+                        me-3 fs-2"></i>
+                    <div>
+                        <h3 class="mb-1">
+                            {% if analysis.advisability == 'Yes' %}
+                                Recommended 🎉
+                            {% elif analysis.advisability == 'No' %}
+                                Not Recommended ⚠️
+                            {% else %}
+                                Neutral Recommendation
+                            {% endif %}
+                        </h3>
+                        <p class="mb-0">
+                            {% if analysis.advisability == 'Yes' %}
+                                This product aligns with your goals and health condition.
+                            {% elif analysis.advisability == 'No' %}
+                                This product does not align with your goals and health condition.
+                            {% else %}
+                                This product may or may not align with your profile.
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="recommendation-badge">
+                    {{ analysis.advisability }}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info d-flex align-items-center">
+            <i class="fas fa-info-circle me-3 fs-4"></i>
+            <div>
+                <h5 class="alert-heading mb-1">Recommendation Unavailable</h5>
+                <p class="mb-0">We couldn't determine the advisability for this product</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+            <!-- Enhanced Summary Section -->
+            {% if summary_points %}
+            <div class="nutrition-summary-card">
+                <div class="summary-header">
+                    <i class="fas fa-clipboard-list me-2"></i>
+                    <h4>Key Nutritional Insights</h4>
+                </div>
+                <div class="summary-points">
+                    {% for point in summary_points %}
+                    <div class="summary-item">
+                        <div class="point-indicator">
+                            <i class="fas fa-circle"></i>
+                        </div>
+                        <div class="point-content">
+                            <p>{{ point }}</p>
+                            {% if forloop.last %}
+                            <div class="summary-footer mt-3">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                Based on your profile: 
+                                {{ user.age }}yo, 
+                                {{ user.weight }}kg, 
+                                {{ user.height }}cm
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+</div>
+
+
+        <!-- Scan Another Product -->
+        <div class="text-center pb-4">
+            <a href="{% url 'scan' %}" class="btn btn-primary btn-lg px-4 scan-button">
+                Scan Another Product
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .nutrition-recommendation {
+        border-radius: 12px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .nutrition-recommendation:hover {
+        transform: translateY(-3px);
+    }
+
+    .recommendation-badge {
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        background: rgba(255,255,255,0.9);
+        color: #2c3e50;
+        padding: 30px 25px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        transform: rotate(45deg);
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Enhanced Summary Styles */
+    .nutrition-summary-card {
+        background: linear-gradient(145deg, #f8f9fa, #ffffff);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .summary-header {
+        background: #2c3e50;
+        color: white;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        font-size: 1.25rem;
+    }
+
+    .summary-points {
+        padding: 2rem;
+    }
+
+    .summary-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: rgba(255,255,255,0.9);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .summary-item:hover {
+        transform: translateX(10px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .point-indicator {
+        color: #4CAF50;
+        font-size: 0.8rem;
+        padding-top: 0.3rem;
+    }
+
+    .point-content p {
+        margin: 0;
+        color: #34495e;
+        line-height: 1.6;
+    }
+
+    .summary-footer {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        padding-top: 1rem;
+        border-top: 1px solid #ecf0f1;
+    }
+
+    @media (max-width: 768px) {
+        .recommendation-badge {
+            display: none;
+        }
+        
+        .summary-item {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+    .analysis-content h6 {
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+    font-size: 1.05rem;
+}
+    .transparent-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        max-width: 900px;
+        margin: auto;
+        width: 100%;
+    }
+    .card-border {
+        border-left: 4px solid #0d6efd;
+    }
+    .fas.fa-circle-small {
+        font-size: 0.6rem;
+    }
+    .alert i {
+        min-width: 30px;
+    }
+
+    .product-image {
+        max-height: 260px;
+        transition: transform 0.3s ease;
+        border-radius: 12px;
+        padding: 10px;
+        background: white;
+    }
+
+    .product-image:hover {
+        transform: scale(1.03);
+    }
+
+    .nutrition-label {
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 1.2rem;
+        max-width: 280px;
+        width: 100%;
+        font-size: 0.95rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .nutrition-title {
+        font-size: 20px;
+        font-weight: 900;
+        color: #2c3e50;
+        border-bottom: 3px solid #2c3e50;
+    }
+
+    .nutrition-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 4px 0;
+    }
+
+    .nutrition-row.bold {
+        font-weight: bold;
+        border-top: 1px solid #333;
+        margin-top: 6px;
+        padding-top: 4px;
+    }
+
+    .nutriscore-scale {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .grade {
+        flex: 1;
+        max-width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    .grade:hover {
+        transform: translateY(-3px);
+    }
+
+    .grade-info {
+        background: rgba(255,255,255,0.9);
+        border-radius: 8px;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        border: 1px solid #eee;
+    }
+
+    .grade-a { background: #038141; }
+    .grade-b { background: #85BB2F; }
+    .grade-c { background: #FECA00; color: #333; }
+    .grade-d { background: #EE8100; }
+    .grade-e { background: #E63E11; }
+
+    .grade.active {
+        outline: 3px solid #333;
+        outline-offset: 2px;
+    }
+
+    .scan-button {
+        background: linear-gradient(135deg, #4CAF50, #8BC34A);
+        border: none;
+        border-radius: 30px;
+        padding: 10px 28px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .scan-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+    }
+
+    .analysis-content {
+        line-height: 1.6;
+        font-size: 1rem;
+        color: #34495e;
+        background: rgba(245, 245, 245, 0.85);
+        border-radius: 12px;
+        padding: 16px;
+        max-width: 650px;
+        margin: auto;
+    }
+
+    @media (max-width: 768px) {
+        .nutrition-label {
+            margin-top: 16px;
+        }
+
+        .product-image {
+            max-height: 220px;
+        }
+
+        .grade {
+            max-width: 50px;
+            height: 50px;
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<script>
+const nutriscoreInfo = {
+    'A': "Excellent nutritional quality - Foods with the best nutritional balance",
+    'B': "Good nutritional quality - Better than average products", 
+    'C': "Average nutritional quality - Should be consumed in moderation",
+    'D': "Poor nutritional quality - Should be consumed occasionally",
+    'E': "Very poor nutritional quality - Should be avoided or consumed rarely"
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const grades = document.querySelectorAll('.grade');
+    const gradeInfo = document.querySelector('.grade-info');
+
+    const activeGrade = document.querySelector('.grade.active');
+    if (activeGrade) {
+        gradeInfo.textContent = nutriscoreInfo[activeGrade.dataset.grade];
+    }
+
+    grades.forEach(grade => {
+        grade.addEventListener('click', function() {
+            grades.forEach(g => g.classList.remove('active'));
+            this.classList.add('active');
+            gradeInfo.textContent = nutriscoreInfo[this.dataset.grade];
+        });
+
+        grade.addEventListener('mouseenter', function() {
+            if(window.innerWidth > 768) {
+                gradeInfo.textContent = nutriscoreInfo[this.dataset.grade];
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

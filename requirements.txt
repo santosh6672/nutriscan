@@ -1,0 +1,8 @@
+Django
+opencv-python
+PyMuPDF
+pyzbar
+requests
+ollama
+mysqlclient
+huggingface_hub
