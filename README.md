@@ -10,14 +10,14 @@ NutriScan AI is a Django-based web app that scans food product barcodes, fetches
 - MySQL database integration
 
 ## 🛠️ Tech Stack
-- **Backend**: Django, MySQL, Ollama
+- **Backend**: Django, MySQL.
 - **Frontend**: HTML, CSS, JS
-- **AI**: Python, requests, PyMuPDF, OpenCV
-- **Deployment**: Docker/Render
+- **AI**: LLM(ollama), requests, PyMuPDF, OpenCV
+- **API**:Openfoodfacts,llama-3
 
 ## ⚙️ How to Run Locally
 ```bash
-git clone https://github.com/<your-username>/nutriscan.git
+git clone https://github.com/santosh6672/nutriscan.git
 cd nutriscan
 pip install -r requirements.txt
 python manage.py migrate
