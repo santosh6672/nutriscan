@@ -4,7 +4,10 @@ import hashlib
 from huggingface_hub import InferenceClient
 
 # Setup Hugging Face client
-HF_TOKEN = os.environ.get("HF_TOKEN", "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")  # fallback to your token
+from dotenv import load_dotenv
+load_dotenv()
+HF_TOKEN = os.getenv("HF_TOKEN")
+  # fallback to your token
 client = InferenceClient(
     provider="novita",
     api_key=HF_TOKEN
